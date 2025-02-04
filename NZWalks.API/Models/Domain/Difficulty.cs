@@ -2,7 +2,7 @@
 {
     public class Difficulty
     {
-        // Both properties are nonnullable
+        // Both properties are non-nullable
         public Guid Id { get; set; }
         public string Name { get; set; }
 

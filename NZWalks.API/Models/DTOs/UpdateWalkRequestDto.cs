@@ -2,7 +2,7 @@
 
 namespace NZWalks.API.Models.DTOs
 {
-    public class AddWalkRequestDto
+    public class UpdateWalkRequestDto
     {
         [Required]
         [MaxLength(100)]
