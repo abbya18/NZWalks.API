@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Text.Json;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http;
@@ -10,33 +11,58 @@ using NZWalks.API.Data;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTOs;
 using NZWalks.API.Repositories;
+using Serilog.Data;
 
 namespace NZWalks.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]         // Any method in this class now can only be accessed by authorized users, now throws a 401 error (unauthorized access)
+    // [Authorize]         // Any method in this class now can only be accessed by authorized users, now throws a 401 error (unauthorized access)
     public class RegionsController : ControllerBase
     {
         private readonly NZWalksDbContext dbContext;
         private readonly IRegionRepository regionRepository;
         private readonly IMapper mapper;
+        private readonly ILogger<RegionsController> logger;
 
-        public RegionsController(NZWalksDbContext dbContext, IRegionRepository regionRepository, IMapper mapper)
+        public RegionsController(NZWalksDbContext dbContext, 
+            IRegionRepository regionRepository, 
+            IMapper mapper,
+            ILogger<RegionsController> logger)
         {
             this.dbContext = dbContext;
             this.regionRepository = regionRepository;
             this.mapper = mapper;
+            this.logger = logger;
         }
 
         // GET ALL Regions
         // GET: https://localhost/api/regions
         [HttpGet]
-        [Authorize(Roles = "Reader")]
+        // [Authorize(Roles = "Reader")]
         public async Task<IActionResult> GetAll()
         {
+            // logger.LogInformation("GetAllRegions Action Method was invoked.");
+
+            try
+            {
+                throw new Exception("This is a custom exception");
+
+                var regionsDomain = await regionRepository.GetAllAsync();
+
+                logger.LogInformation($"Finished GetAllRegions request with data: {JsonSerializer.Serialize(regionsDomain)}");
+
+                return Ok(mapper.Map<List<RegionDto>>(regionsDomain));
+
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                throw;
+            }
+
             // Get Data from Database - Domain Models
-            var regionsDomain = await regionRepository.GetAllAsync();
+            // var regionsDomain = await regionRepository.GetAllAsync();
 
             // Map Domain Models to DTOs (old mapping)
             /*
@@ -55,7 +81,9 @@ namespace NZWalks.API.Controllers
 
             // Map domain models to DTO (using AutoMapper)
             // Return DTOs
-            return Ok(mapper.Map<List<RegionDto>>(regionsDomain));
+            // logger.LogInformation($"Finished GetAllRegions request with data: {JsonSerializer.Serialize(regionsDomain)}");
+
+            // return Ok(mapper.Map<List<RegionDto>>(regionsDomain));
         }
 
         // GET SINGLE REGION (Get Region by ID)

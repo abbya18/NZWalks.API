@@ -43,12 +43,17 @@ namespace NZWalks.API.Controllers
         public async Task<IActionResult> GetAll([FromQuery] string? filterOn, [FromQuery] string? filterQuery, 
             [FromQuery] string? sortBy, [FromQuery] bool? isAscending,
             [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 1000)
-        {
-            var walksDomainModel = await walkRepository.GetAllAsync(filterOn, filterQuery, sortBy, isAscending ?? true, pageNumber, pageSize); // ?? means if its nullable, then set to true.
+            
+            {
+                var walksDomainModel = await walkRepository.GetAllAsync(filterOn, filterQuery, sortBy, 
+                    isAscending ?? true, pageNumber, pageSize); // ?? means if its nullable, then set to true.
 
-            // Map Domain model to DTO
-            return Ok(mapper.Map<List<WalkDto>>(walksDomainModel));
-        }
+                // Create an exception
+                throw new Exception("This is a new exception.");
+
+                // Map Domain model to DTO
+                return Ok(mapper.Map<List<WalkDto>>(walksDomainModel));
+            }
 
         // Get Walk By Id
         // GET: /api/Walks/{id}
